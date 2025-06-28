@@ -46,7 +46,7 @@
 	}
 </script>
 
-<div class="[&>*]:absolute [&>*]:w-full [&>*]:h-full w-screen h-screen p-2">
+<div class="[&>*]:absolute [&>*]:w-full [&>*]:h-full w-screen h-screen">
 
 	<!-- Editor -->
 	<textarea
