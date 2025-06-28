@@ -1,18 +1,26 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	let editor: HTMLDivElement;
+	let editor: HTMLTextAreaElement;
 	let overlayHtml = "";
 
 	onMount(() => editor.focus());
 
+	function handleInput(): void {
+		editor.value = editor.value.replace("	", "  ");
+		rerender();
+	}
+
 	function rerender(): void {
-		let text = sanitize(editor.innerText);
+		let text = sanitize(editor.value);
 		text = parseOsuTimestamps(text);
-		overlayHtml = text.replace(/\n/g, '<br>');
+		text = text.replaceAll("	", "  ")
+			.replaceAll("  ", "&nbsp;&nbsp;");
+		overlayHtml = text.replaceAll("\n", '<br>');
 	}
 
 	function parseOsuTimestamps(text: string): string {
+		console.log(text);
 		return text.replace(
 			/(\d{2}:\d{2}:\d{3}( \(\d+(,\d+)*\))?)/g,
 			match => {
@@ -26,12 +34,11 @@
 	}
 </script>
 
-<div
+<textarea
 	bind:this={editor}
-	contenteditable="true"
-	oninput={rerender}
-	class="absolute w-screen h-screen outline-none text-transparent caret-white"
-></div>
+	oninput={handleInput}
+	class="absolute w-screen h-screen outline-none text-gray-500 caret-white"
+></textarea>
 
 <div
 	class="absolute w-screen h-screen outline-none pointer-events-none"
