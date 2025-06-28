@@ -8,6 +8,7 @@
 
 	function handleInput(): void {
 		editor.value = editor.value.replace("	", "  ");
+		editor.style.height = `${editor.scrollHeight}px`;
 		rerender();
 	}
 
@@ -26,7 +27,7 @@
 		for (i = 0; i < lines.length; i++) {
 			const line = lines[i];
 
-			html += `<div class="border-b-[1px] mb-[-1px] border-gray-700">${line}</div>`;
+			html += `<div>${line}</div><div class="h-[1px] mb-[-1px] bg-gray-700"></div>`;
 		}
 
 		overlayHtml = html;
@@ -46,21 +47,21 @@
 	}
 </script>
 
-<div class="[&>*]:absolute [&>*]:w-full [&>*]:h-full w-screen h-screen">
+<div class="m-2 relative">
+
+	<!-- Overlay -->
+	<div
+		class="absolute z-0 w-full pointer-events-none wrap-break-word"
+	>
+		<!-- eslint-disable svelte/no-at-html-tags -->
+		{@html overlayHtml}
+	</div>
 
 	<!-- Editor -->
 	<textarea
 		bind:this={editor}
 		oninput={handleInput}
-		class="outline-none text-transparent caret-white"
+		class="absolute z-1 outline-none text-transparent caret-white w-full resize-none"
 	></textarea>
-
-	<!-- Overlay -->
-	<div
-		class="pointer-events-none wrap-break-word"
-	>
-		<!-- eslint-disable svelte/no-at-html-tags -->
-		{@html overlayHtml}
-	</div>
 
 </div>
