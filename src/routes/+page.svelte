@@ -71,7 +71,7 @@
 
 	<!-- Overlay -->
 	<div
-		class="absolute w-full pointer-events-none wrap-break-word"
+		class="absolute w-full pointer-events-none wrap-break-word pb-4"
 	>
 		<!-- eslint-disable svelte/no-at-html-tags -->
 		{@html overlayHtml}
