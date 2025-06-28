@@ -37,11 +37,11 @@
 <textarea
 	bind:this={editor}
 	oninput={handleInput}
-	class="absolute w-screen h-screen outline-none text-gray-500 caret-white"
+	class="absolute w-screen h-screen outline-none caret-white"
 ></textarea>
 
 <div
-	class="absolute w-screen h-screen outline-none pointer-events-none"
+	class="absolute w-screen h-screen outline-none pointer-events-none wrap-break-word"
 >
 	<!-- eslint-disable svelte/no-at-html-tags -->
 	{@html overlayHtml}
