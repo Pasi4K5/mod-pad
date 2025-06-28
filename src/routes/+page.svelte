@@ -20,7 +20,6 @@
 	}
 
 	function parseOsuTimestamps(text: string): string {
-		console.log(text);
 		return text.replace(
 			/(\d{2}:\d{2}:\d{3}( \(\d+(,\d+)*\))?)/g,
 			match => {
