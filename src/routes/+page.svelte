@@ -46,15 +46,21 @@
 	}
 </script>
 
-<textarea
-	bind:this={editor}
-	oninput={handleInput}
-	class="absolute w-screen h-screen outline-none text-transparent caret-white"
-></textarea>
+<div class="[&>*]:absolute [&>*]:w-full [&>*]:h-full w-screen h-screen p-2">
 
-<div
-	class="absolute w-screen h-screen outline-none pointer-events-none wrap-break-word"
->
-	<!-- eslint-disable svelte/no-at-html-tags -->
-	{@html overlayHtml}
+	<!-- Editor -->
+	<textarea
+		bind:this={editor}
+		oninput={handleInput}
+		class="outline-none text-transparent caret-white"
+	></textarea>
+
+	<!-- Overlay -->
+	<div
+		class="pointer-events-none wrap-break-word"
+	>
+		<!-- eslint-disable svelte/no-at-html-tags -->
+		{@html overlayHtml}
+	</div>
+
 </div>
