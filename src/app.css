@@ -6,4 +6,5 @@
 * {
     font-family: 'JetBrains Mono', monospace;
     font-style: normal;
+    box-sizing: border-box;
 }

@@ -15,15 +15,28 @@
 		let text = sanitize(editor.value);
 		text = parseOsuTimestamps(text);
 		text = text.replaceAll("	", "  ")
-			.replaceAll("  ", "&nbsp;&nbsp;");
-		overlayHtml = text.replaceAll("\n", '<br>');
+			.replaceAll("  ", "&nbsp;&nbsp;")
+			.replaceAll("\n", "&nbsp;\n")
+			+ "&nbsp;";
+		const lines = text.split("\n");
+
+		let html = "";
+
+		let i: number;
+		for (i = 0; i < lines.length; i++) {
+			const line = lines[i];
+
+			html += `<div class="border-b-[1px] mb-[-1px] border-gray-700">${line}</div>`;
+		}
+
+		overlayHtml = html;
 	}
 
 	function parseOsuTimestamps(text: string): string {
 		return text.replace(
 			/(\d{2}:\d{2}:\d{3}( \(\d+(,\d+)*\))?)/g,
 			match => {
-				return `<a href="osu://edit/${encodeURI(match)}" class="text-blue-200 hover:underline pointer-events-auto font-bold">${match}</a>`;
+				return `<a href="osu://edit/${encodeURI(match)}" class="text-blue-200 hover:underline pointer-events-auto font-bold bg-gray-900 rounded-sm">${match}</a>`;
 			}
 		);
 	}
@@ -36,7 +49,7 @@
 <textarea
 	bind:this={editor}
 	oninput={handleInput}
-	class="absolute w-screen h-screen outline-none caret-white"
+	class="absolute w-screen h-screen outline-none text-transparent caret-white"
 ></textarea>
 
 <div
