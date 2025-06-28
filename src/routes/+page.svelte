@@ -59,7 +59,7 @@
 	}
 </script>
 
-<div class="m-2 relative">
+<div class="m-4 relative">
 
 	<!-- Editor -->
 	<textarea
