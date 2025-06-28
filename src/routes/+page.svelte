@@ -4,12 +4,20 @@
 	let editor: HTMLTextAreaElement;
 	let overlayHtml = "";
 
-	onMount(() => editor.focus());
+	onMount(() => {
+		editor.focus();
+		updateEditorHeight();
+		rerender();
+	});
 
 	function handleInput(): void {
 		editor.value = editor.value.replace("	", "  ");
-		editor.style.height = `${editor.scrollHeight}px`;
+		updateEditorHeight();
 		rerender();
+	}
+
+	function updateEditorHeight(): void {
+		editor.style.height = `${editor.scrollHeight}px`;
 	}
 
 	function rerender(): void {
