@@ -1,5 +1,3 @@
-import { sanitize } from '$lib/stringUtil';
-
 export function transform(text: string): string {
     text = replaceOsuTimestamps(text);
     text = replaceTodos(text);
