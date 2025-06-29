@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { transform } from '$lib/contentTransformer';
+		import { sanitize } from '$lib/stringUtil.js';
 
     let editor: HTMLTextAreaElement;
     let overlayHtml = '';
@@ -22,10 +23,10 @@
     function rerender(): void {
         normalizeEditorContent();
 
-        let text = editor.value;
+        let text = sanitize(editor.value);
         text = text.replaceAll("  ", "&nbsp;&nbsp;")
             .replace(/^ /g, "&nbsp;")
-            .replaceAll("\n", "&nbsp;\n");
+            .replace(/^$/gm, "&nbsp;\n");
         text = transform(text);
         const lines = text.split('\n');
 
