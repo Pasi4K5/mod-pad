@@ -6,14 +6,12 @@
 
 	onMount(() => {
 		editor.focus();
-		updateEditorHeight();
 		rerender();
 	});
 
-	function handleInput(): void {
-		editor.value = editor.value.replace("	", "  ");
+	function normalizeEditorContent(): void {
+		editor.value = editor.value.replace(/\t/g, "  ");
 		updateEditorHeight();
-		rerender();
 	}
 
 	function updateEditorHeight(): void {
@@ -21,10 +19,12 @@
 	}
 
 	function rerender(): void {
+		normalizeEditorContent();
+
 		let text = sanitize(editor.value);
-		text = parseOsuTimestamps(text);
-		text = text.replaceAll("	", "  ")
-			.replaceAll("  ", "&nbsp;&nbsp;")
+		text = replaceOsuTimestamps(text);
+		text = replaceTodos(text);
+		text = text.replaceAll("  ", "&nbsp;&nbsp;")
 			.replaceAll("\n", "&nbsp;\n")
 			+ "&nbsp;";
 		const lines = text.split("\n");
@@ -41,16 +41,22 @@
 		overlayHtml = html;
 	}
 
-	function parseOsuTimestamps(text: string): string {
+	function replaceOsuTimestamps(text: string): string {
 		return text.replace(
 			/(\d{2}:\d{2}:\d{3}( \(\d+(,\d+)*\))?)/g,
 			match => {
 				return '<a '
 					+ `href="osu://edit/${encodeURI(match)}" `
-					+ 'class="z-2 text-blue-200 hover:underline pointer-events-auto font-bold rounded-sm" '
-					+ 'style="background-color: rgba(0, 0, 0, 0.333);" '
+					+ 'class="z-2 text-blue-200 bg-black/33 hover:underline pointer-events-auto font-bold rounded-sm" '
 					+ `>${match}</a>`;
 			}
+		);
+	}
+
+	function replaceTodos(text: string): string {
+		return text.replace(
+			/(\bTODO\b.*)/g,
+			"<span class='font-bold text-amber-600 bg-amber-600/20 rounded-sm'>$1</span>"
 		);
 	}
 
@@ -64,8 +70,9 @@
 	<!-- Editor -->
 	<textarea
 		bind:this={editor}
-		oninput={handleInput}
+		oninput={rerender}
 		onblur={() => setTimeout(() => editor.focus(), 0)}
+		onpaste={normalizeEditorContent}
 		class="absolute outline-none text-transparent caret-white w-full resize-none"
 	></textarea>
 
