@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { transform } from '$lib/contentTransformer';
     import { sanitize } from '$lib/stringUtil.js';
+    import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
 
     let editor: HTMLTextAreaElement;
     let overlayHtml = '';
@@ -60,3 +61,12 @@
         {@html overlayHtml}
     </div>
 </div>
+
+<a
+    class="fixed right-2 bottom-2"
+    href="https://github.com/Pasi4K5/mod-pad"
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <img src={gitHubLogo} alt="GitHub" class="w-10" />
+</a>
