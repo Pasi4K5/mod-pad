@@ -33,7 +33,7 @@
             await tick();
             download('mod-pad.txt', editor.value);
             editor.value = '';
-            rerender();
+            await rerender();
         },
     };
 
