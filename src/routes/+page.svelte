@@ -12,13 +12,13 @@
     import CommandWindow from '$lib/components/CommandWindow.svelte';
     import type { Position } from '$lib/types';
 
-    const PLACEHOLDER = 'Start typing...';
+    const PLACEHOLDER =
+        'Type "<span class="font-extrabold">/</span>" for commands...';
 
     let editor: HTMLTextAreaElement;
     let overlayHtml = $state(PLACEHOLDER);
 
     const commands = {
-        source: () => window.open('https://github.com/Pasi4K5/mod-pad'),
         save: async () => {
             await tick();
             download('mod-pad.txt', editor.value);
@@ -29,12 +29,7 @@
                 rerender();
             });
         },
-        pop: async () => {
-            await tick();
-            download('mod-pad.txt', editor.value);
-            editor.value = '';
-            await rerender();
-        },
+        source: () => window.open('https://github.com/Pasi4K5/mod-pad'),
     };
 
     let typingCommand = $state(false);
