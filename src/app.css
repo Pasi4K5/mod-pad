@@ -4,3 +4,7 @@
 * {
     font-family: 'JetBrains Mono', monospace;
 }
+
+::selection {
+    @apply bg-cyan-600
+}
