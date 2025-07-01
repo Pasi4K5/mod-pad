@@ -33,7 +33,9 @@ const simpleReplacements: Record<
 };
 
 const complexReplacements: Record<string, (match: string) => string> = {
-    '(\\d{2}:\\d{2}:\\d{3}(\\s\\(\\d+(,\\d+)*\\))?)': (match) => {
+    '\\d{2}:\\d{2}:\\d{3}( \\((\\d+(,\\d+)*|\\d+\\|\\d+(,\\d+\\|\\d+)*)\\))?': (
+        match,
+    ) => {
         return (
             '<a ' +
             `href="osu://edit/${encodeURI(match)}" ` +
