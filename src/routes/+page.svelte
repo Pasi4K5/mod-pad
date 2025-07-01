@@ -25,11 +25,11 @@
         normalizeEditorContent();
 
         let text = sanitize(editor.value);
+        text = transform(text);
         text = text
             .replaceAll('  ', '&nbsp;&nbsp;')
             .replace(/^ /g, '&nbsp;')
             .replace(/^$/gm, '&nbsp;\n');
-        text = transform(text);
         const lines = text.split('\n');
 
         let html = '';
