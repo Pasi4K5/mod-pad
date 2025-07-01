@@ -2,7 +2,7 @@
 
 A simple, minimalist, web-based notepad application for osu! modding.
 
-<p style="text-align: center;">
+<p align="center">
     <img src="./assets/img/mod_pad_512.png" alt="mod!pad logo"/>
 </p>
 
