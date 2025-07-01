@@ -1,8 +1,9 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { transform } from '$lib/contentTransformer';
-    import { sanitize } from '$lib/stringUtil.js';
+    import { transform } from '$lib/transformation/contentTransformer';
+    import { sanitize } from '$lib/util/stringUtil.js';
     import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
+    import ContentTransformerEventHandler from '$lib/transformation/ContentTransformerEventHandler.svelte';
 
     const PLACEHOLDER = 'Start typing...';
 
@@ -77,3 +78,5 @@
 >
     <img src={gitHubLogo} alt="GitHub" class="w-10" />
 </a>
+
+<ContentTransformerEventHandler />

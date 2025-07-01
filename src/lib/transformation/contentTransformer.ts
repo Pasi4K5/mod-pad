@@ -1,5 +1,6 @@
 // Probably better to write a parser instead of using regexes at some point, but this is good enough for now.
 
+// noinspection HtmlUnknownTarget
 const simpleReplacements: Record<
     string,
     { replacement: string; flags: string }
@@ -16,9 +17,15 @@ const simpleReplacements: Record<
             '<span class="italic opacity-50">$1</span><em class="font-bold opacity-200 text-yellow-100">$2</em><span class="italic opacity-50">$3</span>',
         flags: 'g',
     },
-    // Bullet points
+    // Bullet point
     '((?:\n|^)\\s*)(\\*)(\\s.*)': {
-        replacement: '$1<span class="text-red-400 font-bold">$2</span>$3',
+        replacement: '$1<span class="text-red-400 font-bold">●</span>$3',
+        flags: 'g',
+    },
+    // URL
+    '(https?://[\\w-]+(?:\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])': {
+        replacement:
+            '<a href="$1" class="text-emerald-300 hover:underline" data-link target="_blank" rel="noopener noreferrer">$1</a>',
         flags: 'g',
     },
 };
