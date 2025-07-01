@@ -1,6 +1,8 @@
 // Probably better to write a parser instead of using regexes at some point, but this is good enough for now.
 
 // noinspection HtmlUnknownTarget
+import { transformCommandQuery } from '$lib/transformation/commandTransformer';
+
 const simpleReplacements: Record<
     string,
     { replacement: string; flags: string }
@@ -41,7 +43,15 @@ const complexReplacements: Record<string, (match: string) => string> = {
     },
 };
 
-export function transform(text: string): string {
+export type TransformResult = {
+    text: string;
+    commandQuery?: string;
+};
+
+export function transform(
+    text: string,
+    caretIdx: number | null,
+): TransformResult {
     for (const [pattern, { replacement, flags }] of Object.entries(
         simpleReplacements,
     )) {
@@ -54,5 +64,5 @@ export function transform(text: string): string {
         text = text.replace(regex, (match) => replacement(match));
     }
 
-    return text;
+    return transformCommandQuery(text, caretIdx ?? 0);
 }
