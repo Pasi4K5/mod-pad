@@ -1,6 +1,5 @@
 <script lang="ts">
     function setLinksClickable(ev: KeyboardEvent, clickable: boolean) {
-        console.log(ev.type);
         if (ev.key !== 'Control') {
             return;
         }
