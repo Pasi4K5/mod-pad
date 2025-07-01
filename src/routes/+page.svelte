@@ -4,8 +4,10 @@
     import { sanitize } from '$lib/stringUtil.js';
     import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
 
+    const PLACEHOLDER = 'Start typing...';
+
     let editor: HTMLTextAreaElement;
-    let overlayHtml = '';
+    let overlayHtml = PLACEHOLDER;
 
     onMount(() => {
         editor.focus();
@@ -22,6 +24,11 @@
     }
 
     function rerender(): void {
+        if (editor.value === '') {
+            overlayHtml = `<span class="text-gray-200 opacity-30 italic">${PLACEHOLDER}</span>`;
+            return;
+        }
+
         normalizeEditorContent();
 
         let text = sanitize(editor.value);
