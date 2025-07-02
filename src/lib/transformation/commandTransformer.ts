@@ -12,7 +12,7 @@ export function transformCommandQuery(
     let commandQuery: string | undefined;
 
     if (caretIdx != null) {
-        for (const match of text.matchAll(/(^| )(\/([A-Za-z]*))/gm)) {
+        for (const match of text.matchAll(/(^|\s)(\/([A-Za-z]*))/gm)) {
             if (match.index + match[0].length !== caretIdx) {
                 continue;
             }
