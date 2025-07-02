@@ -209,7 +209,7 @@
         onkeydown={handleKeyDown}
         onblur={() => setTimeout(() => editor.focus(), 0)}
         onpaste={normalizeEditorContent}
-        class="absolute w-full resize-none text-transparent caret-white outline-none"
+        class="absolute w-full resize-none whitespace-break-spaces text-transparent caret-white outline-none"
     ></textarea>
 
     <!-- Overlay -->
