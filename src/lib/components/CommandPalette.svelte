@@ -3,9 +3,9 @@
 
     type Props = {
         filteredCommands: [string, () => void][];
-        commandWindowPos: Position;
+        pos: Position;
         selectedCommandIdx: number;
-        hideCommandWindow: () => void;
+        hideCommandPalette: () => void;
     };
 
     const props: Props = $props();
@@ -13,8 +13,8 @@
 
 <div
     class="fixed flex flex-col items-stretch overflow-hidden rounded bg-gray-700"
-    style="left: {props.commandWindowPos.x}px;
-        top: {props.commandWindowPos.y}px;"
+    style="left: {props.pos.x}px;
+        top: {props.pos.y}px;"
 >
     {#each props.filteredCommands as [name, command], i (i)}
         <button
@@ -23,7 +23,7 @@
                 : ''}"
             onclick={() => {
                 command();
-                props.hideCommandWindow();
+                props.hideCommandPalette();
             }}
         >
             {name}

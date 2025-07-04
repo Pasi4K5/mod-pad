@@ -9,7 +9,7 @@
         removeCommandQuery,
     } from '$lib/transformation/commandTransformer';
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
-    import CommandWindow from '$lib/components/CommandWindow.svelte';
+    import CommandPalette from '$lib/components/CommandPalette.svelte';
     import type { Position } from '$lib/types';
 
     const PLACEHOLDER =
@@ -37,7 +37,7 @@
     };
 
     let typingCommand = $state(false);
-    let commandWindowPos: Position = $state({ x: 0, y: 0 });
+    let commandPalettePos: Position = $state({ x: 0, y: 0 });
     let commandQuery: string | null = $state(null);
     let selectedCommandIdx = $state(0);
 
@@ -111,7 +111,7 @@
         if (result.commandQuery != null) {
             await handleCommandQuery(result.commandQuery);
         } else {
-            hideCommandWindow();
+            hideCommandPalette();
         }
     }
 
@@ -125,7 +125,7 @@
         ) as HTMLSpanElement;
 
         const boundingRect = commandTextEl.getBoundingClientRect();
-        commandWindowPos = {
+        commandPalettePos = {
             x: boundingRect.left + window.scrollX,
             y: boundingRect.bottom + window.scrollY,
         };
@@ -172,7 +172,7 @@
 
         const command = filteredCommands[selectedCommandIdx];
         command[1]();
-        hideCommandWindow();
+        hideCommandPalette();
         editor.value = removeCommandQuery(editor.value);
         rerender();
     }
@@ -195,11 +195,11 @@
 
     function handleCommandExit(ev: KeyboardEvent): void {
         if (['Escape', 'ArrowLeft', 'ArrowRight'].includes(ev.key)) {
-            hideCommandWindow();
+            hideCommandPalette();
         }
     }
 
-    function hideCommandWindow(): void {
+    function hideCommandPalette(): void {
         typingCommand = false;
         selectedCommandIdx = 0;
     }
@@ -233,11 +233,11 @@
 </a>
 
 {#if typingCommand && filteredCommands.length > 0}
-    <CommandWindow
+    <CommandPalette
         {selectedCommandIdx}
         {filteredCommands}
-        {commandWindowPos}
-        {hideCommandWindow}
+        pos={commandPalettePos}
+        {hideCommandPalette}
     />
 {/if}
 
