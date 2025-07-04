@@ -19,6 +19,10 @@
     let overlayHtml = $state(PLACEHOLDER);
 
     const commands = {
+        help: () =>
+            window.open(
+                'https://github.com/Pasi4K5/mod-pad?tab=readme-ov-file#how-to-use-modpad',
+            ),
         save: async () => {
             await tick();
             download('mod-pad.txt', editor.value);
