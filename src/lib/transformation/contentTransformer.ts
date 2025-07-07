@@ -46,6 +46,8 @@ const complexReplacements: Record<string, (match: string) => string> = {
 };
 
 export function transform(text: string, caretIdx: number | null): string {
+    text = transformCommandQuery(text, caretIdx ?? 0);
+
     for (const [pattern, { replacement, flags }] of Object.entries(
         simpleReplacements,
     )) {
@@ -58,5 +60,5 @@ export function transform(text: string, caretIdx: number | null): string {
         text = text.replace(regex, (match) => replacement(match));
     }
 
-    return transformCommandQuery(text, caretIdx ?? 0);
+    return text;
 }
