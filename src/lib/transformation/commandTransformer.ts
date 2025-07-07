@@ -5,7 +5,7 @@ let cmdStartIdx = 0,
 
 export function transformCommandQuery(text: string, caretIdx?: number): string {
     if (caretIdx != null) {
-        for (const match of text.matchAll(/(^|\s)(\/([A-Za-z]*))/gm)) {
+        for (const match of text.matchAll(/(^|\s)(\/)([A-Za-z]*)/gm)) {
             if (match.index + match[0].length !== caretIdx) {
                 continue;
             }
@@ -16,7 +16,7 @@ export function transformCommandQuery(text: string, caretIdx?: number): string {
             return (
                 text.slice(0, cmdStartIdx) +
                 match[1] +
-                `<span ${COMMAND_DATA_ATTR}>${match[2]}</span>` +
+                `<span ${COMMAND_DATA_ATTR} class="font-extrabold">${match[2]}${match[3]}</span>` +
                 text.slice(cmdEndIdx)
             );
         }
