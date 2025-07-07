@@ -27,7 +27,7 @@ const simpleReplacements: Record<
     // URL
     '(https?://[\\w-]+(?:\\.[\\w-]+)+[\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])': {
         replacement:
-            '<a href="$1" class="text-emerald-300 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>',
+            '<a href="$1" class="text-emerald-300 hover:underline" data-link target="_blank" rel="noopener noreferrer">$1</a>',
         flags: 'g',
     },
 };
