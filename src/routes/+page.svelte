@@ -67,45 +67,38 @@
         rerender();
     });
 
-    function normalizeEditorContent(): void {
-        editor.value = editor.value.replace(/\t/g, '  ');
-        updateEditorHeight();
-    }
-
-    function updateEditorHeight(): void {
-        editor.style.height = `${editor.scrollHeight}px`;
-    }
-
     async function rerender(): Promise<void> {
-        if (editor.value === '') {
+        editor.style.height = `${editor.scrollHeight}px`;
+
+        const isEmpty = editor.value === '';
+
+        if (isEmpty) {
             overlayHtml = `<span class="text-gray-200 opacity-30 italic">${PLACEHOLDER}</span>`;
+        } else {
+            let text = sanitize(editor.value);
+
+            // Transform content.
+            text = transform(
+                text,
+                editor.selectionStart === editor.selectionEnd
+                    ? editor.selectionStart
+                    : null,
+            ).replaceAll(/^$/gm, '&nbsp;\n');
+
+            let html = '';
+            const lines = text.split('\n');
+
+            // Add dividers between lines.
+            let i: number;
+            for (i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                html += `<div>${line}</div><div class="h-[1px] mb-[-1px] bg-gray-700"></div>`;
+            }
+
+            // Update overlay.
+            overlayHtml = html;
         }
-
-        normalizeEditorContent();
-
-        let text = sanitize(editor.value);
-
-        // Transform content.
-        text = transform(
-            text,
-            editor.selectionStart === editor.selectionEnd
-                ? editor.selectionStart
-                : null,
-        ).replaceAll(/^$/gm, '&nbsp;\n');
-
-        let html = '';
-        const lines = text.split('\n');
-
-        // Add dividers between lines.
-        let i: number;
-        for (i = 0; i < lines.length; i++) {
-            const line = lines[i];
-
-            html += `<div>${line}</div><div class="h-[1px] mb-[-1px] bg-gray-700"></div>`;
-        }
-
-        // Update overlay.
-        overlayHtml = html;
 
         await handleCommandQuery();
     }
@@ -220,7 +213,7 @@
         oninput={rerender}
         onkeydown={handleKeyDown}
         onblur={() => setTimeout(() => editor.focus(), 0)}
-        onpaste={normalizeEditorContent}
+        onpaste={() => (editor.value = editor.value.replace(/\t/g, '  '))}
         class="w-full max-w-full resize-none text-transparent caret-white outline-none"
     ></textarea>
 
