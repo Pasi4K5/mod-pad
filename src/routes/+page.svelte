@@ -91,14 +91,7 @@
             editor.selectionStart === editor.selectionEnd
                 ? editor.selectionStart
                 : null,
-        );
-
-        // Fix consecutive spaces and newlines.
-        text = text
-            .replaceAll(/^ /gm, '&nbsp;')
-            .replaceAll(/^$/gm, '&nbsp;\n')
-            .replaceAll(/^ *\$/gm, '&nbsp;\n')
-            .replaceAll('  ', '&nbsp;&nbsp;');
+        ).replaceAll(/^$/gm, '&nbsp;\n');
 
         let html = '';
         const lines = text.split('\n');
@@ -218,7 +211,9 @@
     }
 </script>
 
-<div class="relative m-4">
+<div
+    class="relative m-4 max-w-full [&>*]:absolute [&>*]:wrap-break-word [&>*]:break-all [&>*]:whitespace-break-spaces"
+>
     <!-- Editor -->
     <textarea
         bind:this={editor}
@@ -226,11 +221,11 @@
         onkeydown={handleKeyDown}
         onblur={() => setTimeout(() => editor.focus(), 0)}
         onpaste={normalizeEditorContent}
-        class="absolute w-full resize-none whitespace-break-spaces text-transparent caret-white outline-none"
+        class="w-full max-w-full resize-none text-transparent caret-white outline-none"
     ></textarea>
 
     <!-- Overlay -->
-    <div class="pointer-events-none absolute w-full pb-4 wrap-break-word">
+    <div class="pointer-events-none w-full max-w-full pb-4">
         <!-- eslint-disable svelte/no-at-html-tags -->
         {@html overlayHtml}
     </div>
