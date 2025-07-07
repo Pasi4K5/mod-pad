@@ -12,7 +12,7 @@
 </script>
 
 <div
-    class="fixed flex flex-col items-stretch overflow-hidden rounded bg-gray-700"
+    class="absolute flex flex-col items-stretch overflow-hidden rounded bg-gray-700"
     style="left: {props.pos.x}px; top: {props.pos.y}px;"
 >
     {#each props.filteredCommands as cmd, i (i)}
