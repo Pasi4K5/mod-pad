@@ -45,15 +45,7 @@ const complexReplacements: Record<string, (match: string) => string> = {
     },
 };
 
-export type TransformResult = {
-    text: string;
-    commandQuery?: string;
-};
-
-export function transform(
-    text: string,
-    caretIdx: number | null,
-): TransformResult {
+export function transform(text: string, caretIdx: number | null): string {
     for (const [pattern, { replacement, flags }] of Object.entries(
         simpleReplacements,
     )) {

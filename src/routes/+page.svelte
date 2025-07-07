@@ -10,7 +10,7 @@
     } from '$lib/transformation/commandTransformer';
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
     import CommandPalette from '$lib/components/CommandPalette.svelte';
-    import type { Position } from '$lib/types';
+    import type { Command, Position } from '$lib/types';
 
     const PLACEHOLDER =
         'Type "<span class="font-extrabold">/</span>" for commands...';
@@ -18,41 +18,49 @@
     let editor: HTMLTextAreaElement;
     let overlayHtml = $state(PLACEHOLDER);
 
-    const commands = {
-        help: () =>
-            window.open(
-                'https://github.com/Pasi4K5/mod-pad?tab=readme-ov-file#how-to-use-modpad',
-            ),
-        save: async () => {
-            await tick();
-            download('mod-pad.txt', editor.value);
+    const commands: Array<Command> = [
+        {
+            name: 'help',
+            action: () =>
+                window.open(
+                    'https://github.com/Pasi4K5/mod-pad?tab=readme-ov-file#how-to-use-modpad',
+                ),
         },
-        open: () => {
-            pickFileAndRead().then((content) => {
-                editor.value = content;
-                rerender();
-            });
+        {
+            name: 'save',
+            action: async () => {
+                await tick();
+                download('mod-pad.txt', editor.value);
+            },
         },
-        source: () => window.open('https://github.com/Pasi4K5/mod-pad'),
-    };
+        {
+            name: 'open',
+            action: () => {
+                pickFileAndRead().then((content) => {
+                    editor.value = content;
+                    rerender();
+                });
+            },
+        },
+        {
+            name: 'source',
+            action: () => window.open('https://github.com/Pasi4K5/mod-pad'),
+        },
+    ];
 
-    let typingCommand = $state(false);
-    let commandPalettePos: Position = $state({ x: 0, y: 0 });
-    let commandQuery: string | null = $state(null);
-    let selectedCommandIdx = $state(0);
+    const commandPalette = $state({
+        pos: { x: 0, y: 0 } as Position,
+        query: null as string | null,
+        selectedIdx: 0,
+    });
+
+    const typingCommand = $derived(commandPalette.query != null);
 
     const filteredCommands = $derived(
-        Object.entries(commands).filter(([key]) =>
-            key.startsWith(commandQuery ?? ''),
+        commands.filter((cmd) =>
+            cmd.name.startsWith(commandPalette.query ?? ''),
         ),
     );
-
-    $effect(() => {
-        selectedCommandIdx = Math.min(
-            selectedCommandIdx,
-            filteredCommands.length - 1,
-        );
-    });
 
     onMount(() => {
         editor.focus();
@@ -71,7 +79,6 @@
     async function rerender(): Promise<void> {
         if (editor.value === '') {
             overlayHtml = `<span class="text-gray-200 opacity-30 italic">${PLACEHOLDER}</span>`;
-            return;
         }
 
         normalizeEditorContent();
@@ -79,7 +86,7 @@
         let text = sanitize(editor.value);
 
         // Transform content.
-        const result = transform(
+        text = transform(
             text,
             editor.selectionStart === editor.selectionEnd
                 ? editor.selectionStart
@@ -87,7 +94,7 @@
         );
 
         // Fix consecutive spaces and newlines.
-        text = result.text
+        text = text
             .replaceAll(/^ /gm, '&nbsp;')
             .replaceAll(/^$/gm, '&nbsp;\n')
             .replaceAll(/^ *\$/gm, '&nbsp;\n')
@@ -107,30 +114,35 @@
         // Update overlay.
         overlayHtml = html;
 
-        // Handle command query.
-        if (result.commandQuery != null) {
-            await handleCommandQuery(result.commandQuery);
-        } else {
-            hideCommandPalette();
-        }
+        await handleCommandQuery();
     }
 
-    async function handleCommandQuery(cmd: string): Promise<void> {
-        // Wait until the DOM is updated to get the command element and its position.
+    async function handleCommandQuery(): Promise<void> {
+        // Wait until the DOM is updated to get the command element.
         await tick();
 
-        commandQuery = cmd;
-        const commandTextEl = document.querySelector(
-            `[${COMMAND_DATA_ATTR}]`,
-        ) as HTMLSpanElement;
+        const cmdTextEl = document.querySelector(`[${COMMAND_DATA_ATTR}]`) as
+            | HTMLSpanElement
+            | undefined;
 
-        const boundingRect = commandTextEl.getBoundingClientRect();
-        commandPalettePos = {
+        commandPalette.query = cmdTextEl?.textContent?.trim()?.slice(1) ?? null;
+
+        if (cmdTextEl == null) {
+            commandPalette.selectedIdx = 0;
+
+            return;
+        }
+
+        commandPalette.selectedIdx = Math.min(
+            commandPalette.selectedIdx,
+            filteredCommands.length - 1,
+        );
+
+        const boundingRect = cmdTextEl.getBoundingClientRect();
+        commandPalette.pos = {
             x: boundingRect.left + window.scrollX,
             y: boundingRect.bottom + window.scrollY,
         };
-
-        typingCommand = true;
     }
 
     function handleKeyDown(ev: KeyboardEvent): void {
@@ -170,8 +182,8 @@
 
         ev.preventDefault();
 
-        const command = filteredCommands[selectedCommandIdx];
-        command[1]();
+        const command = filteredCommands[commandPalette.selectedIdx];
+        command.action();
         hideCommandPalette();
         editor.value = removeCommandQuery(editor.value);
         rerender();
@@ -184,13 +196,14 @@
 
         if (ev.key === 'ArrowDown') {
             ev.preventDefault();
-            selectedCommandIdx++;
+            commandPalette.selectedIdx =
+                (commandPalette.selectedIdx + 1) % filteredCommands.length;
         } else if (ev.key === 'ArrowUp') {
             ev.preventDefault();
-            selectedCommandIdx += filteredCommands.length - 1;
+            commandPalette.selectedIdx =
+                (commandPalette.selectedIdx + filteredCommands.length - 1) %
+                filteredCommands.length;
         }
-
-        selectedCommandIdx %= filteredCommands.length;
     }
 
     function handleCommandExit(ev: KeyboardEvent): void {
@@ -200,8 +213,8 @@
     }
 
     function hideCommandPalette(): void {
-        typingCommand = false;
-        selectedCommandIdx = 0;
+        commandPalette.query = null;
+        commandPalette.selectedIdx = 0;
     }
 </script>
 
@@ -234,9 +247,9 @@
 
 {#if typingCommand && filteredCommands.length > 0}
     <CommandPalette
-        {selectedCommandIdx}
+        selectedCommandIdx={commandPalette.selectedIdx}
         {filteredCommands}
-        pos={commandPalettePos}
+        pos={commandPalette.pos}
         {hideCommandPalette}
     />
 {/if}

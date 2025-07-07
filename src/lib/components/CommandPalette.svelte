@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Position } from '$lib/types';
+    import type { Command, Position } from '$lib/types';
 
     type Props = {
-        filteredCommands: [string, () => void][];
+        filteredCommands: Array<Command>;
         pos: Position;
         selectedCommandIdx: number;
         hideCommandPalette: () => void;
@@ -13,20 +13,19 @@
 
 <div
     class="fixed flex flex-col items-stretch overflow-hidden rounded bg-gray-700"
-    style="left: {props.pos.x}px;
-        top: {props.pos.y}px;"
+    style="left: {props.pos.x}px; top: {props.pos.y}px;"
 >
-    {#each props.filteredCommands as [name, command], i (i)}
+    {#each props.filteredCommands as cmd, i (i)}
         <button
             class="px-3 text-left text-white {i === props.selectedCommandIdx
                 ? 'bg-gray-600'
                 : ''}"
             onclick={() => {
-                command();
+                cmd.action();
                 props.hideCommandPalette();
             }}
         >
-            {name}
+            {cmd.name}
         </button>
     {/each}
 </div>
