@@ -1,5 +1,3 @@
-// Probably better to write a parser instead of using regexes at some point, but this is good enough for now.
-
 // noinspection HtmlUnknownTarget
 import { transformCommandQuery } from '$lib/transformation/commandTransformer';
 import { replaceAll } from '$lib/util/regexUtil';
@@ -15,7 +13,7 @@ const simpleReplacements: Record<
         flags: 'gi',
     },
     // Emphasis
-    '(\\*)([^\\s].*?[^\\s])(\\*)': {
+    '(\\*)([^\\s\\*].*?[^\\s\\*])(\\*)': {
         replacement:
             '<span class="italic opacity-50">$1</span><em class="font-bold opacity-200 text-yellow-100">$2</em><span class="italic opacity-50">$3</span>',
         flags: 'g',
@@ -39,15 +37,11 @@ const complexReplacements: Record<
 > = {
     // osu! timestamps
     '\\d{2}:\\d{2}:\\d{3} (\\((\\d+(,\\d+)*|\\d+\\|\\d+(,\\d+\\|\\d+)*)\\))?': {
-        replace: (match) => {
-            console.log('MATCH!');
-            return (
-                '<a ' +
-                `href="osu://edit/${encodeURI(match[0])}" ` +
-                'class="z-2 text-blue-200 bg-black/33 hover:underline pointer-events-auto font-bold rounded-sm" ' +
-                `>${match[0]}</a>`
-            );
-        },
+        replace: (match) =>
+            '<a ' +
+            `href="osu://edit/${encodeURI(match[0])}" ` +
+            'class="z-2 text-blue-200 bg-black/33 hover:underline pointer-events-auto font-bold rounded-sm" ' +
+            `>${match[0]}</a>`,
         flags: 'g',
     },
     // Headings
@@ -64,11 +58,22 @@ const complexReplacements: Record<
 
             return `<span class="${colorClass} font-bold">${match[1]} ${match[2]}</span>`;
         },
-        flags: 'gm',
+        flags: 'g',
     },
 };
 
-export function transform(text: string, caretIdx: number | null): string {
+export function transform(
+    lines: string[],
+    caretPos: { line: number; col: number } | null,
+): string[] {
+    return lines.map((line, idx) => {
+        const caretIdx =
+            caretPos && caretPos.line === idx ? caretPos.col : null;
+        return transformLine(line, caretIdx);
+    });
+}
+
+function transformLine(text: string, caretIdx: number | null): string {
     text = transformCommandQuery(text, caretIdx ?? 0);
 
     for (const [pattern, { replacement, flags }] of Object.entries(

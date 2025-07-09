@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount, tick } from 'svelte';
-    import { transform } from '$lib/transformation/contentTransformer';
     import { sanitize } from '$lib/util/stringUtil.js';
     import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
     import ContentTransformerEventHandler from '$lib/transformation/ContentTransformerEventHandler.svelte';
@@ -11,12 +10,13 @@
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
     import CommandPalette from '$lib/components/CommandPalette.svelte';
     import type { Command, Position } from '$lib/types';
+    import { transform } from '$lib/transformation/contentTransformer';
 
     const PLACEHOLDER =
-        'Type "<span class="font-extrabold">/</span>" for commands...';
+        '<span class="text-gray-200 opacity-30 italic">Type "<span class="font-extrabold">/</span>" for commands...</span>';
 
     let editor: HTMLTextAreaElement;
-    let overlayHtml = $state(PLACEHOLDER);
+    let overlayHtmlLines = $state([PLACEHOLDER]);
 
     const commands: Array<Command> = [
         {
@@ -67,40 +67,70 @@
         rerender();
     });
 
-    async function rerender(): Promise<void> {
+    async function handleInput(ev?: Event) {
+        rerender(ev as InputEvent);
+        await handleCommandQuery();
+    }
+
+    function rerender(ev?: InputEvent): void {
         editor.style.height = `${editor.scrollHeight}px`;
 
         const isEmpty = editor.value === '';
 
         if (isEmpty) {
-            overlayHtml = `<span class="text-gray-200 opacity-30 italic">${PLACEHOLDER}</span>`;
-        } else {
-            let text = sanitize(editor.value);
+            overlayHtmlLines = [PLACEHOLDER];
 
-            // Transform content.
-            text = transform(
-                text,
-                editor.selectionStart === editor.selectionEnd
-                    ? editor.selectionStart
-                    : null,
-            ).replaceAll(/^$/gm, '&nbsp;\n');
-
-            let html = '';
-            const lines = text.split('\n');
-
-            // Add dividers between lines.
-            let i: number;
-            for (i = 0; i < lines.length; i++) {
-                const line = lines[i];
-
-                html += `<div>${line}</div><div class="h-[1px] mb-[-1px] bg-gray-700"></div>`;
-            }
-
-            // Update overlay.
-            overlayHtml = html;
+            return;
         }
 
-        await handleCommandQuery();
+        const text = sanitize(editor.value);
+
+        if (ev == null) {
+            rerenderAll(text);
+
+            return;
+        }
+
+        const caretPos = editor.selectionEnd;
+
+        const linesUpToCaret = text.substring(0, caretPos).split('\n');
+        const caretLineIdx = linesUpToCaret.length - 1;
+
+        if (ev?.inputType === 'insertLineBreak') {
+            overlayHtmlLines.splice(caretLineIdx + 1, 0, '');
+
+            return;
+        }
+
+        const data = ev?.data;
+
+        if (data == null) {
+            // If no data is present, the input is not a simple text input, so we rerender all lines.
+            rerenderAll(text);
+
+            return;
+        }
+
+        const caretColIdx = linesUpToCaret[caretLineIdx].length;
+        const numChangedLines = data.split('\n').length;
+        const firstChangedLineIdx = caretLineIdx - numChangedLines + 1;
+        const changedLines = text
+            .split('\n')
+            .slice(firstChangedLineIdx, caretLineIdx + 1);
+        const transformedLines = transform(changedLines, {
+            line: caretLineIdx,
+            col: caretColIdx,
+        });
+
+        overlayHtmlLines = [
+            ...overlayHtmlLines.slice(0, firstChangedLineIdx),
+            ...transformedLines,
+            ...overlayHtmlLines.slice(caretLineIdx + 1),
+        ];
+    }
+
+    function rerenderAll(text: string): void {
+        overlayHtmlLines = transform(text.split('\n'), null);
     }
 
     async function handleCommandQuery(): Promise<void> {
@@ -210,7 +240,7 @@
     <!-- Editor -->
     <textarea
         bind:this={editor}
-        oninput={rerender}
+        oninput={handleInput}
         onkeydown={handleKeyDown}
         onblur={() => setTimeout(() => editor.focus(), 0)}
         onpaste={() => (editor.value = editor.value.replace(/\t/g, '  '))}
@@ -220,7 +250,10 @@
     <!-- Overlay -->
     <div class="pointer-events-none w-full max-w-full pb-4">
         <!-- eslint-disable svelte/no-at-html-tags -->
-        {@html overlayHtml}
+        {#each overlayHtmlLines as line, i (i)}
+            {@html line}
+            <hr class="mb-[-1px] h-[1px] border-gray-700" />
+        {/each}
     </div>
 </div>
 
