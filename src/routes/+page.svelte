@@ -16,7 +16,7 @@
     } from '$lib/transformation/contentTransformer';
 
     const PLACEHOLDER =
-        '<span class="text-gray-200 opacity-30 italic">Type "<span class="font-extrabold">/</span>" for commands...</span>';
+        '<span class="text-gray-200 opacity-30 italic">Start typing, or type "<span class="font-extrabold">/</span>" for commands...</span>';
 
     let editor: HTMLTextAreaElement;
     let overlay: HTMLDivElement;
