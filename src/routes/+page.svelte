@@ -295,7 +295,6 @@
         onkeydown={handleKeyDown}
         onselectionchange={handleSelect}
         onblur={() => setTimeout(() => editor.focus(), 0)}
-        onpaste={() => (editor.value = editor.value.replace(/\t/g, '  '))}
         class="w-full max-w-full resize-none text-transparent caret-white outline-none"
     ></textarea>
 
