@@ -96,6 +96,7 @@
 
         if (
             ev == null ||
+            ev.inputType === 'insertFromPaste' || // Rerender all lines on paste because Chromium sucks.
             currSelection.start !== currSelection.end // Relies on the fact that "selectionchange" is handled after "input".
         ) {
             rerenderAll(text);
