@@ -107,13 +107,6 @@
 
         const linesUpToCaret = text.substring(0, caretPos).split('\n');
         const caretLineIdx = linesUpToCaret.length - 1;
-
-        if (ev?.inputType === 'insertLineBreak') {
-            overlayHtmlLines.splice(caretLineIdx + 1, 0, '');
-
-            return;
-        }
-
         const data = ev?.data;
 
         if (data == null) {
