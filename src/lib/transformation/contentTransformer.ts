@@ -12,7 +12,7 @@ const simplePatterns: Array<{
         pattern: '(\\bTO-?DO\\b.*)',
         replacement:
             '<span class="font-bold text-amber-600 bg-amber-600/20 rounded-sm">$1</span>',
-        flags: 'gi',
+        flags: 'i',
     },
     // Emphasis
     {
@@ -23,9 +23,15 @@ const simplePatterns: Array<{
     },
     // Bullet points
     {
-        pattern: '((?:\n|^)\\s*)(\\*)(\\s.*)',
+        pattern: '^(\\s*)(\\*)(\\s+[^\\s]+.*)',
         replacement: '$1<span class="text-red-400 font-bold">●</span>$3',
-        flags: 'g',
+        flags: '',
+    },
+    // Numbered lists
+    {
+        pattern: '^(\\s*)(\\d+\\.)(\\s+[^\\s]+.*)',
+        replacement: '$1<span class="text-red-400 font-bold">$2</span>$3',
+        flags: '',
     },
     // URLs
     {
@@ -55,7 +61,7 @@ const complexReplacements: Array<{
     },
     // Headings
     {
-        pattern: '^(#+) (.*)',
+        pattern: '^(#+)(\\s+[^\\s]+.*)',
         replace: (match) => {
             const level = match[1].length;
             const colors = [
@@ -66,7 +72,7 @@ const complexReplacements: Array<{
             ];
             const colorClass = colors[Math.min(level - 1, colors.length - 1)];
 
-            return `<span class="${colorClass} font-bold">${match[1]} ${match[2]}</span>`;
+            return `<span class="${colorClass} font-bold">${match[1]}${match[2]}</span>`;
         },
         flags: 'g',
     },
