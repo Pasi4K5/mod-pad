@@ -76,6 +76,11 @@
         await handleCommandQuery();
     }
 
+    let currSelection = {
+        start: 0,
+        end: 0,
+    };
+
     function rerender(ev?: InputEvent): void {
         editor.style.height = `${editor.scrollHeight}px`;
 
@@ -89,7 +94,10 @@
 
         const text = sanitize(editor.value);
 
-        if (ev == null) {
+        if (
+            ev == null ||
+            currSelection.start !== currSelection.end // Relies on the fact that "selectionchange" is handled after "input".
+        ) {
             rerenderAll(text);
 
             return;
@@ -237,6 +245,15 @@
         commandPalette.selectedIdx = 0;
     }
 
+    function handleSelect(): void {
+        currSelection = {
+            start: editor.selectionStart,
+            end: editor.selectionEnd,
+        };
+
+        cleanUpCommandHighlighting();
+    }
+
     /**
      * Removes command highlighting when the caret moves to a different line.
      * This does not happen automatically, because the line hasn't been changed,
@@ -282,7 +299,7 @@
         bind:this={editor}
         oninput={handleInput}
         onkeydown={handleKeyDown}
-        onselectionchange={cleanUpCommandHighlighting}
+        onselectionchange={handleSelect}
         onblur={() => setTimeout(() => editor.focus(), 0)}
         onpaste={() => (editor.value = editor.value.replace(/\t/g, '  '))}
         class="w-full max-w-full resize-none text-transparent caret-white outline-none"
