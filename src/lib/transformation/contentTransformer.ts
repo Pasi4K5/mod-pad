@@ -1,5 +1,6 @@
 import { transformCommandQuery } from '$lib/transformation/commandTransformer';
 import { replaceAll } from '$lib/util/regexUtil';
+import type { CaretPosition } from '$lib/types';
 
 // noinspection HtmlUnknownTarget
 const simplePatterns: Array<{
@@ -80,21 +81,24 @@ const complexReplacements: Array<{
 
 export function transform(
     lines: string[],
-    caretPos: { line: number; col: number } | null,
+    caretPos: CaretPosition | null,
 ): string[] {
     const transformedLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
         const caretIdx =
-            caretPos != null && caretPos.line === i ? caretPos.col : null;
+            caretPos != null && caretPos.line === i ? caretPos : null;
         transformedLines.push(transformLine(lines[i], caretIdx));
     }
 
     return transformedLines;
 }
 
-export function transformLine(text: string, caretIdx: number | null): string {
-    text = transformCommandQuery(text, caretIdx ?? 0);
+export function transformLine(
+    text: string,
+    caretPos: CaretPosition | null,
+): string {
+    text = transformCommandQuery(text, caretPos ?? undefined);
 
     for (let i = 0; i < simplePatterns.length; i++) {
         const { pattern, replacement, flags } = simplePatterns[i];

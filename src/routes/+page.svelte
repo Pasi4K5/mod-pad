@@ -130,6 +130,7 @@
             .split('\n')
             .slice(firstChangedLineIdx, caretLineIdx + 1);
         const transformedLines = transform(changedLines, {
+            global: caretPos,
             line: caretLineIdx - firstChangedLineIdx,
             col: caretColIdx,
         });
