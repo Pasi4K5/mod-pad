@@ -1,7 +1,7 @@
-// noinspection HtmlUnknownTarget
 import { transformCommandQuery } from '$lib/transformation/commandTransformer';
 import { replaceAll } from '$lib/util/regexUtil';
 
+// noinspection HtmlUnknownTarget
 const simplePatterns: Array<{
     pattern: string;
     replacement: string;
@@ -87,7 +87,7 @@ export function transform(
     return transformedLines;
 }
 
-function transformLine(text: string, caretIdx: number | null): string {
+export function transformLine(text: string, caretIdx: number | null): string {
     text = transformCommandQuery(text, caretIdx ?? 0);
 
     for (let i = 0; i < simplePatterns.length; i++) {

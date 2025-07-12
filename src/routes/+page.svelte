@@ -10,12 +10,16 @@
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
     import CommandPalette from '$lib/components/CommandPalette.svelte';
     import type { Command, Position } from '$lib/types';
-    import { transform } from '$lib/transformation/contentTransformer';
+    import {
+        transform,
+        transformLine,
+    } from '$lib/transformation/contentTransformer';
 
     const PLACEHOLDER =
         '<span class="text-gray-200 opacity-30 italic">Type "<span class="font-extrabold">/</span>" for commands...</span>';
 
     let editor: HTMLTextAreaElement;
+    let overlay: HTMLDivElement;
     let overlayHtmlLines = $state([PLACEHOLDER]);
 
     const commands: Array<Command> = [
@@ -232,6 +236,42 @@
         commandPalette.query = null;
         commandPalette.selectedIdx = 0;
     }
+
+    /**
+     * Removes command highlighting when the caret moves to a different line.
+     * This does not happen automatically, because the line hasn't been changed,
+     * so it is not considered for rerendering.
+     */
+    function cleanUpCommandHighlighting(): void {
+        const cmdTextEl = document.querySelector(
+            `[${COMMAND_DATA_ATTR}]`,
+        ) as HTMLSpanElement | null;
+
+        if (cmdTextEl == null) {
+            return;
+        }
+
+        let lineEl: HTMLElement;
+        for (
+            lineEl = cmdTextEl;
+            lineEl.parentElement != overlay;
+            lineEl = lineEl.parentElement!
+        ) {
+            // empty
+        }
+
+        const cmdLineIdx = Array.from(overlay.children).indexOf(lineEl);
+        const caretLineIdx =
+            editor.value.substring(0, editor.selectionEnd).split('\n').length -
+            1;
+
+        if (cmdLineIdx !== caretLineIdx) {
+            overlayHtmlLines[cmdLineIdx] = transformLine(
+                editor.value.split('\n')[cmdLineIdx],
+                null,
+            );
+        }
+    }
 </script>
 
 <div
@@ -242,13 +282,14 @@
         bind:this={editor}
         oninput={handleInput}
         onkeydown={handleKeyDown}
+        onselectionchange={cleanUpCommandHighlighting}
         onblur={() => setTimeout(() => editor.focus(), 0)}
         onpaste={() => (editor.value = editor.value.replace(/\t/g, '  '))}
         class="w-full max-w-full resize-none text-transparent caret-white outline-none"
     ></textarea>
 
     <!-- Overlay -->
-    <div class="pointer-events-none w-full max-w-full pb-4">
+    <div bind:this={overlay} class="pointer-events-none w-full max-w-full pb-4">
         <!-- eslint-disable svelte/no-at-html-tags -->
         {#each overlayHtmlLines as line, i (i)}
             {@html line}
