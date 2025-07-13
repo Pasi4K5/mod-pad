@@ -35,6 +35,7 @@
             action: async () => {
                 await tick();
                 download('mod-pad.txt', editor.value);
+                changesSaved = true;
             },
         },
         {
@@ -66,20 +67,29 @@
         ),
     );
 
+    let currSelection = {
+        start: 0,
+        end: 0,
+    };
+
+    let changesSaved = false;
+
     onMount(() => {
+        window.addEventListener('beforeunload', (ev) => {
+            if (!changesSaved && editor.value !== '') {
+                ev.preventDefault();
+            }
+        });
+
         editor.focus();
         rerender();
     });
 
     async function handleInput(ev?: Event) {
+        changesSaved = false;
         rerender(ev as InputEvent);
         await handleCommandQuery();
     }
-
-    let currSelection = {
-        start: 0,
-        end: 0,
-    };
 
     function rerender(ev?: InputEvent): void {
         editor.style.height = `${editor.scrollHeight}px`;
