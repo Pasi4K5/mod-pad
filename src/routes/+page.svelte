@@ -4,7 +4,7 @@
     import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
     import ContentTransformerEventHandler from '$lib/transformation/ContentTransformerEventHandler.svelte';
     import {
-        COMMAND_DATA_ATTR,
+        COMMAND_DATA_ATTR, getCommandStartIdx,
         removeCommandQuery,
     } from '$lib/transformation/commandTransformer';
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
@@ -269,16 +269,10 @@
             return;
         }
 
-        let lineEl: HTMLElement;
-        for (
-            lineEl = cmdTextEl;
-            lineEl.parentElement != overlay;
-            lineEl = lineEl.parentElement!
-        ) {
-            // empty
-        }
-
-        const cmdLineIdx = Array.from(overlay.children).indexOf(lineEl);
+        const cmdLineIdx = editor.value
+            .slice(0, getCommandStartIdx())
+            .split('\n')
+            .length - 1;
         const caretLineIdx =
             editor.value.substring(0, editor.selectionEnd).split('\n').length -
             1;
@@ -288,6 +282,7 @@
                 editor.value.split('\n')[cmdLineIdx],
                 null,
             );
+            hideCommandPalette();
         }
     }
 </script>

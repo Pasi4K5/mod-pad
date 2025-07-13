@@ -36,3 +36,7 @@ export function transformCommandQuery(
 export function removeCommandQuery(text: string): string {
     return text.slice(0, globalCmdStartIdx) + text.slice(globalCmdEndIdx);
 }
+
+export function getCommandStartIdx(): number {
+    return globalCmdStartIdx;
+}
