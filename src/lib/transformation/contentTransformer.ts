@@ -73,7 +73,7 @@ const complexReplacements: Array<{
         replace: (match) => {
             const level = match[1].length;
             const colors = [
-                'text-red-300',
+                'text-red-400',
                 'text-orange-300',
                 'text-amber-300',
                 'text-yellow-300',
