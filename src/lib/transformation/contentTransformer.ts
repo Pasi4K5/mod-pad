@@ -42,6 +42,13 @@ const simplePatterns: Array<{
             '<a href="$1" class="text-emerald-300 hover:underline" data-link target="_blank" rel="noopener noreferrer">$1</a>',
         flags: 'g',
     },
+    // Difficulties
+    {
+        pattern: '(^|\\s)(\\[.*?\\])',
+        replacement:
+            '$1<span class="underline text-purple-500">$2</span>',
+        flags: 'g',
+    },
 ];
 
 const complexReplacements: Array<{
