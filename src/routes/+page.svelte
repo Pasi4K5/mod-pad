@@ -47,10 +47,6 @@
                 });
             },
         },
-        {
-            name: 'source',
-            action: () => window.open('https://github.com/Pasi4K5/mod-pad'),
-        },
     ];
 
     const commandPalette = $state({
