@@ -58,7 +58,7 @@ const complexReplacements: Array<{
     // osu! timestamps
     {
         pattern:
-            '\\d{2}:\\d{2}:\\d{3} (\\((\\d+(,\\d+)*|\\d+\\|\\d+(,\\d+\\|\\d+)*)\\))?',
+            '\\d{2}:\\d{2}:\\d{3}( \\((\\d+(,\\d+)*|\\d+\\|\\d+(,\\d+\\|\\d+)*)\\))?',
         replace: (match) =>
             '<a ' +
             `href="osu://edit/${encodeURI(match[0])}" ` +
