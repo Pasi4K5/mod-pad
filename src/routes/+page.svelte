@@ -14,12 +14,12 @@
         transform,
         transformLine,
     } from '$lib/transformation/contentTransformer';
+    import Overlay from '$lib/components/Overlay.svelte';
 
     const PLACEHOLDER =
         '<span class="text-gray-200 opacity-30 italic">Start typing, or type "<span class="font-extrabold">/</span>" for commands...</span>';
 
     let editor: HTMLTextAreaElement;
-    let overlay: HTMLDivElement;
     let overlayHtmlLines = $state([PLACEHOLDER]);
 
     const commands: Array<Command> = [
@@ -301,12 +301,8 @@
     ></textarea>
 
     <!-- Overlay -->
-    <div bind:this={overlay} class="pointer-events-none w-full max-w-full pb-4">
-        <!-- eslint-disable svelte/no-at-html-tags -->
-        {#each overlayHtmlLines as line, i (i)}
-            {@html line}
-            <hr class="mb-[-1px] h-[1px] border-gray-700" />
-        {/each}
+    <div class="pointer-events-none w-full max-w-full pb-4">
+        <Overlay lines={overlayHtmlLines} />
     </div>
 </div>
 
