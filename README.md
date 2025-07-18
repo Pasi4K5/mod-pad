@@ -29,7 +29,8 @@ mod!pad is built with Svelte, TypeScript, Tailwind CSS, and Deno.
 
 **Prerequisites:**
 - [Git](https://git-scm.com/downloads)
-- [Deno](https://deno.com/)
+- [Node.js](https://nodejs.org/en/download)
+- A package manager for Node.js, preferably [pnpm](https://pnpm.io/installation)
 
 **Step 1:** Clone the repository:
 
@@ -41,13 +42,13 @@ cd mod-pad
 **Step 2:** Install dependencies:
 
 ```bash
-deno install --allow-scripts
+pnpm install
 ```
 
 **Step 3:** Start the development server:
 
 ```bash
-deno task dev --open
+pnpm run dev
 ```
 
 ## Contributing
