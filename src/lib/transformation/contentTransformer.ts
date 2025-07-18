@@ -17,7 +17,7 @@ const simplePatterns: Array<{
     },
     // Emphasis
     {
-        pattern: '(\\*)([^\\s\\*].*?[^\\s\\*])(\\*)',
+        pattern: '(\\*)([^\\s\\*](?:.*?[^\\s\\*])?)(\\*)',
         replacement:
             '<span class="italic opacity-50">$1</span><em class="font-bold opacity-200 text-yellow-100">$2</em><span class="italic opacity-50">$3</span>',
         flags: 'g',
@@ -45,8 +45,7 @@ const simplePatterns: Array<{
     // Difficulties
     {
         pattern: '(^|\\s)(\\[.*?\\])',
-        replacement:
-            '$1<span class="underline text-purple-500">$2</span>',
+        replacement: '$1<span class="underline text-purple-500">$2</span>',
         flags: 'g',
     },
 ];
