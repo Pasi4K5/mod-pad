@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { onMount, tick } from 'svelte';
+    import { onMount, tick, untrack } from 'svelte';
     import { sanitize } from '$lib/util/stringUtil.js';
     import gitHubLogo from '$lib/assets/img/github-mark-white.svg';
     import ContentTransformerEventHandler from '$lib/transformation/ContentTransformerEventHandler.svelte';
     import {
-        COMMAND_DATA_ATTR, getCommandStartIdx,
+        COMMAND_DATA_ATTR,
+        getCommandStartIdx,
         removeCommandQuery,
     } from '$lib/transformation/commandTransformer';
     import { download, pickFileAndRead } from '$lib/util/fileUtil';
@@ -15,11 +16,13 @@
         transformLine,
     } from '$lib/transformation/contentTransformer';
     import Overlay from '$lib/components/Overlay.svelte';
+    import { getElementByAttribute } from '$lib/util/domUtil';
 
     const PLACEHOLDER =
         '<span class="text-gray-200 opacity-30 italic">Start typing, or type "<span class="font-extrabold">/</span>" for commands...</span>';
 
     let editor: HTMLTextAreaElement;
+    let overlayWrapper: HTMLDivElement;
     let overlayHtmlLines = $state([PLACEHOLDER]);
 
     const commands: Array<Command> = [
@@ -69,9 +72,16 @@
     };
 
     let changesSaved = false;
+    let clickedLink = false;
 
     onMount(() => {
         window.addEventListener('beforeunload', (ev) => {
+            if (clickedLink) {
+                clickedLink = false;
+
+                return;
+            }
+
             if (!changesSaved && editor.value !== '') {
                 ev.preventDefault();
             }
@@ -80,6 +90,21 @@
         editor.focus();
         rerender();
     });
+
+    function explicitEffect(fn: () => void, depsFn: () => unknown[]): void {
+        $effect(() => {
+            depsFn();
+            untrack(fn);
+        });
+    }
+
+    explicitEffect(addLinkHandlers, () => [overlayHtmlLines]);
+
+    function addLinkHandlers() {
+        for (let el of overlayWrapper.getElementsByTagName('a')) {
+            el.onclick = () => (clickedLink = true);
+        }
+    }
 
     async function handleInput(ev?: Event) {
         changesSaved = false;
@@ -150,9 +175,7 @@
         // Wait until the DOM is updated to get the command element.
         await tick();
 
-        const cmdTextEl = document.querySelector(`[${COMMAND_DATA_ATTR}]`) as
-            | HTMLSpanElement
-            | undefined;
+        const cmdTextEl = getElementByAttribute(COMMAND_DATA_ATTR);
 
         commandPalette.query = cmdTextEl?.textContent?.trim()?.slice(1) ?? null;
 
@@ -261,18 +284,14 @@
      * so it is not considered for rerendering.
      */
     function cleanUpCommandHighlighting(): void {
-        const cmdTextEl = document.querySelector(
-            `[${COMMAND_DATA_ATTR}]`,
-        ) as HTMLSpanElement | null;
+        const cmdTextEl = getElementByAttribute(COMMAND_DATA_ATTR);
 
         if (cmdTextEl == null) {
             return;
         }
 
-        const cmdLineIdx = editor.value
-            .slice(0, getCommandStartIdx())
-            .split('\n')
-            .length - 1;
+        const cmdLineIdx =
+            editor.value.slice(0, getCommandStartIdx()).split('\n').length - 1;
         const caretLineIdx =
             editor.value.substring(0, editor.selectionEnd).split('\n').length -
             1;
@@ -301,7 +320,10 @@
     ></textarea>
 
     <!-- Overlay -->
-    <div class="pointer-events-none w-full max-w-full pb-4">
+    <div
+        bind:this={overlayWrapper}
+        class="pointer-events-none w-full max-w-full pb-4"
+    >
         <Overlay lines={overlayHtmlLines} />
     </div>
 </div>
