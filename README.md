@@ -23,7 +23,7 @@ URLs are clickable while holding `Ctrl`.
 
 ## Tech Stack
 
-mod!pad is built with Svelte, TypeScript, Tailwind CSS, and Deno.
+mod!pad is built with Svelte, TypeScript, and Tailwind CSS.
 
 ## Running mod!pad locally
 
